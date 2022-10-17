@@ -13,6 +13,7 @@ import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
 import Register from './Register';
 import Login from './Login';
+import InfoTooltip from './InfoTooltip';
 
 import { CurrentUserContext } from './CurrentUserContext';
 
@@ -170,6 +171,8 @@ function App() {
                 isLoading={isLoading} />
                 <ImagePopup 
                 card={selectedCard} 
+                onClose={closeAllPopups} />
+                <InfoTooltip
                 onClose={closeAllPopups} />
             </div>
         </CurrentUserContext.Provider>
