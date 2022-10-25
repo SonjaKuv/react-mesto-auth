@@ -1,0 +1,12 @@
+.header__navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: end;
+}
+
+@media (max-width: 959px) {
+  .header__navigation {
+    margin: 0 24px 0;
+  }
+}

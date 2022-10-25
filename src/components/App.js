@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 
 import '../pages/index.css';
 
@@ -11,22 +11,46 @@ import api from '../utils/Api';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
+import { CurrentUserContext } from './CurrentUserContext';
+import ProtectedRoute from './ProtectedRoute';
 import Register from './Register';
 import Login from './Login';
 import InfoTooltip from './InfoTooltip';
-
-import { CurrentUserContext } from './CurrentUserContext';
-
+import * as auth from '../auth';
 
 function App() {
-
+    console.log('app');
     const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
     const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
     const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
+    const [isRegisterPopupOpen, setIsRegisterPopupOpen] = React.useState(false);
+    const [registerStatus, setRegisterStatus] = React.useState(false);
     const [selectedCard, setSelectedCard] = React.useState({});
     const [currentUser, setCurrentUser] = React.useState('');
     const [cards, setCards] = React.useState([]);
-    const [isLoading, setIsLoading] = React.useState(false)
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [loggedIn, setLoggedIn] = React.useState(false);
+    const [isRegForm, setIsRegForm] = React.useState(false);
+    const [email, setEmail] = React.useState('');
+    const [password, setPassword] = React.useState('');
+    const history = useNavigate();
+
+    React.useEffect(() => {
+        const jwt = localStorage.getItem('token');
+        if (jwt) {
+            auth.getContent(jwt).then((res) => {
+                if (res.data._id) {
+                setEmail(res.data.email);
+                history('/');
+                setLoggedIn(true);
+                console.log(res)   // вызывается 1 лишний раз
+                }})
+                .catch((err) => {
+                    console.log(err);
+                    setLoggedIn(false);
+                });
+        }
+    }, []);
 
     React.useEffect(() => {
         api.getUserInfo()
@@ -47,6 +71,48 @@ function App() {
                 console.log(err);
             });
     }, []);
+
+    // Регистрация, авторизация и выход
+    function handleLogin(email, password) {
+        auth.authorize(email, password)
+            .then((res) => {
+                setLoggedIn(true);
+                setEmail(email);
+                setPassword(password);
+                localStorage.setItem('token', res.token);
+                history('/');
+            })
+            .catch((e) => {
+                console.log(e);
+                setRegisterStatus(false);
+                setIsRegisterPopupOpen(true);
+            });
+    };
+
+    function handleRegister(email, password) {
+        auth.register(email, password)
+            .then((res) => {
+                setRegisterStatus(true);
+                setIsRegisterPopupOpen(true);
+                history('/sign-in')
+            })
+            .then(() => {
+                setEmail('');
+                setPassword('')
+            }).catch((e) => {
+                console.log(e);
+                setRegisterStatus(true);
+                setIsRegisterPopupOpen(true);
+            })
+    };
+
+    function handleLogout() {
+        localStorage.removeItem('token');
+        history('/');
+        setEmail('');
+        setPassword('');
+        setLoggedIn(false);
+    };
 
     // хандлеры изменения стейт переменных
     function handleCardClick(card) {
@@ -129,51 +195,62 @@ function App() {
     }
 
     // закрытие всех попапов
-
     function closeAllPopups() {
         setIsEditAvatarPopupOpen(false);
         setIsEditProfilePopupOpen(false);
         setIsAddPlacePopupOpen(false);
+        setIsRegisterPopupOpen(false);
         setSelectedCard({});
     };
 
     return (
         <CurrentUserContext.Provider value={currentUser}>
             <div className="page">
-                <Header />
-                    <Routes>
-                        <Route exact path="/" element={<Main 
-                        onEditProfile={handleEditProfileClick} 
-                        onAddPlace={handleAddPlaceClick} 
-                        onEditAvatar={handleEditAvatarClick} 
-                        onCardClick={handleCardClick} 
-                        cards={cards} 
-                        onCardLike={handleCardLike} 
-                        onCardDelete={handleCardDelete} />} />
-                        <Route path="/sign-up" element={<Register />} />
-                        <Route path="/sign-in" element={<Login />} />
-                    </Routes>
+                <Header
+                    email={email}
+                    loggedIn={loggedIn}
+                    onLogout={handleLogout}
+                    isRegForm={isRegForm} />
+                <Routes>
+                    <Route path="/" element={
+                        <ProtectedRoute loggedIn={loggedIn}>
+                            <Main
+                                onEditProfile={handleEditProfileClick}
+                                onAddPlace={handleAddPlaceClick}
+                                onEditAvatar={handleEditAvatarClick}
+                                onCardClick={handleCardClick}
+                                cards={cards}
+                                onCardLike={handleCardLike}
+                                onCardDelete={handleCardDelete} />
+                        </ProtectedRoute>
+                    }>
+                    </Route>
+                    <Route path="/sign-up" element={<Register onRegister={handleRegister} setIsRegForm={setIsRegForm} />} />
+                    <Route path="/sign-in" element={<Login onLogin={handleLogin} setIsRegForm={setIsRegForm} />} />
+                </Routes>
                 <Footer />
-                <EditProfilePopup 
-                isOpen={isEditProfilePopupOpen} 
-                onClose={closeAllPopups} 
-                onUpdateUser={handleUpdateUser} 
-                isLoading={isLoading} />
-                <EditAvatarPopup 
-                isOpen={isEditAvatarPopupOpen} 
-                onClose={closeAllPopups} 
-                onUpdateAvatar={handleUpdateAvatar} 
-                isLoading={isLoading} />
-                <AddPlacePopup 
-                isOpen={isAddPlacePopupOpen} 
-                onClose={closeAllPopups} 
-                onAddPlace={handleAddPlaceSubmit} 
-                isLoading={isLoading} />
-                <ImagePopup 
-                card={selectedCard} 
-                onClose={closeAllPopups} />
+                <EditProfilePopup
+                    isOpen={isEditProfilePopupOpen}
+                    onClose={closeAllPopups}
+                    onUpdateUser={handleUpdateUser}
+                    isLoading={isLoading} />
+                <EditAvatarPopup
+                    isOpen={isEditAvatarPopupOpen}
+                    onClose={closeAllPopups}
+                    onUpdateAvatar={handleUpdateAvatar}
+                    isLoading={isLoading} />
+                <AddPlacePopup
+                    isOpen={isAddPlacePopupOpen}
+                    onClose={closeAllPopups}
+                    onAddPlace={handleAddPlaceSubmit}
+                    isLoading={isLoading} />
+                <ImagePopup
+                    card={selectedCard}
+                    onClose={closeAllPopups} />
                 <InfoTooltip
-                onClose={closeAllPopups} />
+                    isOpen={isRegisterPopupOpen}
+                    status={registerStatus}
+                    onClose={closeAllPopups} />
             </div>
         </CurrentUserContext.Provider>
     )

@@ -1,14 +1,17 @@
 import React from 'react';
+import succsesImage from '../images/Union.png';
+import failedImage from '../images/Union-red.png';
 
-function InfoTooltip({ status, onClose }) {
-    const statusImage = String(status.link);
+function InfoTooltip({ isOpen, status, onClose }) {
+
+    const className = `popup info-tool popup-container ${isOpen ? "popup_opened" : ""}`
 
     return (
-        <div className='info-tool'>
+        <div className={className}>
             <button type="button" className="popup__close-icon button" aria-label="Закрыть окно" onClick={onClose}></button>
-            <div class='info-tool__container'>
-                <img className='info-tool__icon' alt="Иконка регистрации" src={statusImage}/> 
-                <p className='info-tool__text'>{status.text}</p>
+            <div className='info-tool info-tool__container'>
+                <img className='info-tool__icon' alt="Иконка регистрации" src={(status) ? succsesImage : failedImage}/> 
+                <p className='info-tool__text'>{(status) ? "Вы успешно зарегистрировались!" : "Что-то пошло не так! Попробуйте ещё раз."}</p>
             </div>
         </div>
     )

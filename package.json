@@ -42,5 +42,17 @@
   },
   "devDependencies": {
     "gh-pages": "^4.0.0"
+  },
+  "description": "Используйте ваши предыдущие наработки по проекту Mesto. Это может быть работа 11-го спринта или его улучшенная версия после 2-х последних спринтов.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SonjaKuv/react-mesto-auth.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SonjaKuv/react-mesto-auth/issues"
   }
 }

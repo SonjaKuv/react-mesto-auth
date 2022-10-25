@@ -1,15 +1,11 @@
 .footer {
   margin: 0 auto;
   max-width: 880px;
-  padding-left: 15.625%;
-  padding-right: 15.625%;
-  padding-bottom: 60px;
+  padding: 60px 15.625%;
 }
 
 @media (max-width: 320px) {
   .footer {
-    padding-left: 5.94%;
-    padding-right: 5.94%;
-    padding-bottom: 36px;
+    padding: 36px 5.94%;
   }
 }
