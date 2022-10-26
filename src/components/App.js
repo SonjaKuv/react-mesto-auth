@@ -25,11 +25,10 @@ function App() {
     const [isRegisterPopupOpen, setIsRegisterPopupOpen] = React.useState(false);
     const [registerStatus, setRegisterStatus] = React.useState(false);
     const [selectedCard, setSelectedCard] = React.useState({});
-    const [currentUser, setCurrentUser] = React.useState('');
+    const [currentUser, setCurrentUser] = React.useState({});
     const [cards, setCards] = React.useState([]);
     const [isLoading, setIsLoading] = React.useState(false);
     const [loggedIn, setLoggedIn] = React.useState(false);
-    const [isRegForm, setIsRegForm] = React.useState(false);
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
     const history = useNavigate();
@@ -92,7 +91,6 @@ function App() {
         auth.register(email, password)
             .then(() => {
                 setRegisterStatus(true);
-                setIsRegisterPopupOpen(true);
                 history('/sign-in');
             })
             .then(() => {
@@ -100,7 +98,9 @@ function App() {
                 setPassword('');
             }).catch((err) => {
                 console.log(err);
-                setRegisterStatus(true);
+                setRegisterStatus(false);
+            })
+            .finally(() => {
                 setIsRegisterPopupOpen(true);
             })
     };
@@ -201,14 +201,28 @@ function App() {
         setSelectedCard({});
     };
 
+    const isOpen = isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || selectedCard.link
+
+    React.useEffect(() => {
+      function closeByEscape(evt) {
+        if(evt.key === 'Escape') {
+          closeAllPopups();
+        }
+      }
+      if(isOpen) {
+        document.addEventListener('keydown', closeByEscape);
+        return () => {
+          document.removeEventListener('keydown', closeByEscape);
+        }
+      }
+    }, [isOpen]);
+
     return (
         <CurrentUserContext.Provider value={currentUser}>
             <div className="page">
                 <Header
                     email={email}
-                    loggedIn={loggedIn}
-                    onSignOut={handleSignout}
-                    isRegForm={isRegForm} />
+                    onSignOut={handleSignout} />
                 <Routes>
                     <Route path="/" element={
                         <ProtectedRoute loggedIn={loggedIn}>
@@ -223,8 +237,8 @@ function App() {
                         </ProtectedRoute>
                     }>
                     </Route>
-                    <Route path="/sign-up" element={<Register onRegister={handleRegister} setIsRegForm={setIsRegForm} />} />
-                    <Route path="/sign-in" element={<Login onLogin={handleLogin} setIsRegForm={setIsRegForm} />} />
+                    <Route path="/sign-up" element={<Register onRegister={handleRegister} />} />
+                    <Route path="/sign-in" element={<Login onLogin={handleLogin} />} />
                 </Routes>
                 <Footer />
                 <EditProfilePopup
