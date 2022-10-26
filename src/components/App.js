@@ -11,15 +11,14 @@ import api from '../utils/Api';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
-import { CurrentUserContext } from './CurrentUserContext';
+import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import ProtectedRoute from './ProtectedRoute';
 import Register from './Register';
 import Login from './Login';
 import InfoTooltip from './InfoTooltip';
-import * as auth from '../auth';
+import * as auth from '../utils/auth';
 
 function App() {
-    console.log('app');
     const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
     const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
     const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
@@ -40,11 +39,11 @@ function App() {
         if (jwt) {
             auth.getContent(jwt).then((res) => {
                 if (res.data._id) {
-                setEmail(res.data.email);
-                history('/');
-                setLoggedIn(true);
-                console.log(res)   // вызывается 1 лишний раз
-                }})
+                    setEmail(res.data.email);
+                    history('/');
+                    setLoggedIn(true);
+                }
+            })
                 .catch((err) => {
                     console.log(err);
                     setLoggedIn(false);
@@ -82,8 +81,8 @@ function App() {
                 localStorage.setItem('token', res.token);
                 history('/');
             })
-            .catch((e) => {
-                console.log(e);
+            .catch((err) => {
+                console.log(err);
                 setRegisterStatus(false);
                 setIsRegisterPopupOpen(true);
             });
@@ -91,24 +90,23 @@ function App() {
 
     function handleRegister(email, password) {
         auth.register(email, password)
-            .then((res) => {
+            .then(() => {
                 setRegisterStatus(true);
                 setIsRegisterPopupOpen(true);
-                history('/sign-in')
+                history('/sign-in');
             })
             .then(() => {
                 setEmail('');
-                setPassword('')
-            }).catch((e) => {
-                console.log(e);
+                setPassword('');
+            }).catch((err) => {
+                console.log(err);
                 setRegisterStatus(true);
                 setIsRegisterPopupOpen(true);
             })
     };
 
-    function handleLogout() {
+    function handleSignout() {
         localStorage.removeItem('token');
-        history('/');
         setEmail('');
         setPassword('');
         setLoggedIn(false);
@@ -209,7 +207,7 @@ function App() {
                 <Header
                     email={email}
                     loggedIn={loggedIn}
-                    onLogout={handleLogout}
+                    onSignOut={handleSignout}
                     isRegForm={isRegForm} />
                 <Routes>
                     <Route path="/" element={

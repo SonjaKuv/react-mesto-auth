@@ -11,6 +11,8 @@
 
 @media (max-width: 959px) {
   .header {
+    flex-direction: column-reverse;
+    gap: 67px;
     padding-top: 28px;
     padding-bottom: 31.6px;
   }

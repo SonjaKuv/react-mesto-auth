@@ -1,13 +1,10 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-// import * as auth from '../auth';
+import { Link } from 'react-router-dom';
 
 function Register({ onRegister, setIsRegForm }) {
-    console.log('reg');
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
-    // const history = useNavigate();
-    console.log(email);
+
     React.useEffect(() => {
         setIsRegForm(true);
     }, []);

@@ -3,14 +3,14 @@ import React from 'react';
 function Login({ onLogin, setIsRegForm }) {
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
-    console.log('логин');
+
     React.useEffect(() => {
         setIsRegForm(false);
     }, []);
 
     function handleSubmit(evt) {
         evt.preventDefault();
-        onLogin( email, password )
+        onLogin(email, password)
     };
 
     return (

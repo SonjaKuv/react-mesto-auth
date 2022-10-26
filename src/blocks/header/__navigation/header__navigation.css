@@ -1,12 +1,15 @@
 .header__navigation {
   display: flex;
-  flex-wrap: wrap;
   gap: 24px;
-  justify-content: end;
+  justify-content: flex-end;
 }
 
 @media (max-width: 959px) {
   .header__navigation {
     margin: 0 24px 0;
+    flex-direction: column;
+    text-align: center;
+    padding-top: 12px;
+    gap: 19px;
   }
 }

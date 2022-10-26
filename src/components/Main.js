@@ -1,7 +1,7 @@
 import React from 'react';
 import addButton from '../images/Vector.svg';
 import Card from './Card';
-import { CurrentUserContext } from './CurrentUserContext';
+import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 function Main({ onEditProfile, onAddPlace, onEditAvatar, onCardClick, cards, onCardLike, onCardDelete }) {
 
