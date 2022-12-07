@@ -1,4 +1,4 @@
-export const BASE_URL = 'http://api.sonja-kuv.nomoredomains.club';
+export const BASE_URL = 'http://sonja-kuv.nomoredomains.club';
 
 const checkResponse = (res) => {
   if (res.ok) {
